@@ -12,6 +12,7 @@ router.post('/signIn',
 
 router.post('/signUp', addUser);
 
+router.post('/addProperty', addProperty);
 
 /**
  * -------------- GET ROUTES ----------------
@@ -53,12 +54,18 @@ router.get('/getProperties', getProperties);
  */
 router.get('/protected-route', (req, res, next) => {
 
+    console.log(req.user)
     // This is how you check if a user is authenticated and protect a route.  You could turn this into a custom middleware to make it less redundant
     if (req.isAuthenticated()) {
         res.send('<h1>You are authenticated</h1><p><a href="/logout">Logout and reload</a></p>');
     } else {
         res.send('<h1>You are not authenticated</h1><p><a href="/signIn">SignIn</a></p>');
     }
+});
+
+
+router.get('/last', async(req, res) => {
+    res.json({trx: await require("../model/transaction").getLastTransaction()})
 });
 
 // Visiting this route logs the user out

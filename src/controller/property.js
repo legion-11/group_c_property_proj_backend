@@ -1,4 +1,5 @@
 const {findByPropertiesByOwner, findByPropertyId, insertProperty, findProperties} = require("../model/property")
+const {addTransactionCreated} = require("../controller/transaction")
 
 //    const newProperty = {
 //         ownerId: req.body.ownerId,
@@ -18,32 +19,42 @@ const {findByPropertiesByOwner, findByPropertyId, insertProperty, findProperties
 //     };
 
 const addProperty = async (req, res) => {
-    console.log("create property "+ req.body)
+
+    if (!req.isAuthenticated()) {
+        res.json({success: false, msg: "You are not authenticated"});
+        return
+    }
+
+    console.log("addProperty "+ JSON.stringify(req.body))
 
     const currentDate = new Date()
     const newProperty = {
-        ownerId: req.body.ownerId,
+        ownerId: req.user._id,
         contactNumber: req.body.contactNumber,
-        createdAt: currentDate,
         description: req.body.description,
         zipcode: req.body.zipcode,
         city: req.body.city,
         country: req.body.country,
         isApartment: req.body.isApartment,
         apartmentNumber: req.body.apartmentNumber,
+        createdAt: currentDate,
         type: null,
         startAt: null,
         endAt: null,
-        img: [req.body.img],
+        // img: req.body.img,
     };
     try {
-        const property = await insertProperty(newProperty)
-            .then((property) => {
 
-                res.json({success: true, msg: property});
-            })
-    } catch (e) {
-        res.json({success: false, msg: err});
+        const property = await insertProperty(newProperty)
+        console.log("addProperty: property ")
+        console.log(property)
+        const trx = await addTransactionCreated(req.user._id, property.insertedId)
+        console.log("addProperty: transaction ")
+        console.log(trx)
+
+        res.json({success: true, msg: property});
+    } catch (err) {
+        res.json({success: false, msg: err.message});
     }
 };
 

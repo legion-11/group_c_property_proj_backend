@@ -1,5 +1,4 @@
 const {getDB} = require("../config/database");
-const hashObject = require("../lib/passwordUtils").hashObject;
 
 const db = getDB();
 const transactionCollectionName = "transaction";
@@ -30,4 +29,11 @@ const insertTransaction = (trx) => {
         .insertOne(trx)
 };
 
-module.exports = {};
+const getLastTransaction = () => {
+    return transactionCollection.findOne(
+        {},
+        { sort: { _id: -1 } }
+    )
+};
+
+module.exports = {getLastTransaction, insertTransaction};

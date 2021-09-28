@@ -32,6 +32,6 @@ passport.serializeUser((user, cb) => {
 
 passport.deserializeUser((id, cb) => {
     findByUserIdAndUpdate(id, {$currentDate: {lastTimeAuth: true}})
-         .then((user) => {cb(null, user)})
+         .then((user) => {cb(null, user.value)})
          .catch((err) => {return cb(err)});
 });
