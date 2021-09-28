@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const {findByEmail, findByUserId, findByUserIdAndUpdate} = require("../model/user")
+const {findByEmail, findByUserIdAndUpdate} = require("../model/user")
 const validPassword = require("../lib/passwordUtils").validPassword;
 
 const customFields = {
