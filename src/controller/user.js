@@ -14,12 +14,12 @@ const passwordUtils = require('../lib/passwordUtils');
 
 
 const addUser = async (req, res) => {
+    console.log("addUser "+ JSON.stringify(req.body))
     const user = await findByEmail(req.body.email)
-    console.log("create user "+ JSON.stringify(req.body))
     if (user) {
         res.json({success: false, msg: 'email already in use'});
     }
-    console.log("create user "+ JSON.stringify(req.body))
+
     const saltHash = passwordUtils.genPassword(req.body.password);
     const salt = saltHash.salt;
     const hash = saltHash.hash;

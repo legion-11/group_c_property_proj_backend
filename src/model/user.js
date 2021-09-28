@@ -24,6 +24,4 @@ const insertUser = (user, options = {}) => {
         .insertOne(user, options)
 };
 
-
-
 module.exports = {findByEmail, findByUserId: findUserById, insertUser, findByUserIdAndUpdate};
