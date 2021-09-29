@@ -203,7 +203,9 @@ const rentProperty = async (req, res) => {
     }
 
 
+    const x = () => {
 
+    }
 
     const buyProperty = async (req, res) => {
         if (!checkAuth(req, res)) {return}
