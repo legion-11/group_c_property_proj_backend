@@ -202,17 +202,6 @@ const rentProperty = async (req, res) => {
         console.log(e.message)
     }
 
-
-    const x = () => {
-        // comment goes here
-        // this is a change
-        // this is my change
-    }
-
-    const y = () => {
-
-    }
-
     const buyProperty = async (req, res) => {
         if (!checkAuth(req, res)) {return}
         const propertyId = req.body.propertyId;
