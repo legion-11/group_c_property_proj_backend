@@ -1,6 +1,6 @@
 const {hashObject} = require("../lib/passwordUtils");
 
-const {getLastTransaction, insertTransaction} = require("../model/transaction")
+const {getLastTransaction, insertTransaction, getTransactionsCount} = require("../model/transaction")
 
 const types = {
     create: 1,
@@ -8,6 +8,18 @@ const types = {
     buy: 3,
     setForRent: 4,
     rent: 5,
+}
+
+let count = null;
+
+const getCount = async () => {
+    if (count == null) {
+        try {
+            count = await getTransactionsCount()
+        }catch (e) {
+            throw e
+        }
+    }
 }
 
 const getLastTransactionHash = async () => {
@@ -19,32 +31,36 @@ const getLastTransactionHash = async () => {
     }
 }
 
-const basicTransaction = (type, ownerId, propertyId, previousHash) => {
+const basicTransaction = async (type, ownerId, propertyId) => {
     console.log("type " + type)
-  return {
-      type: type,
-      ownerId: ownerId,
-      propertyId: propertyId,
-      previousHash: previousHash,
-  }
+    await getCount()
+    const previousHash = await getLastTransactionHash()
+    count++
+    return {
+        type: type,
+        ownerId: ownerId,
+        propertyId: propertyId,
+        nonce: count,
+        previousHash: previousHash,
+    }
 }
 
-const getTransactionCreatedObj = (ownerId, propertyId, previousHash) => {
-    const transactionObject = basicTransaction(types.create, ownerId, propertyId, previousHash)
+const getTransactionCreatedObj = async (ownerId, propertyId) => {
+    const transactionObject = await basicTransaction(types.create, ownerId, propertyId)
     transactionObject.hash = hashObject(transactionObject)
     return transactionObject
 }
 
 const addTransactionCreated = async (ownerId, propertyId) => {
     try{
-        const previousHash = await getLastTransactionHash()
-        const trx = getTransactionCreatedObj(ownerId, propertyId, previousHash)
+        const trx = await getTransactionCreatedObj(ownerId, propertyId)
+        console.log(trx)
         return insertTransaction(trx)
     }catch (e) {
+        count--
         console.error("addTransactionCreated: "+e.message)
     }
 }
-
 
 //
 // const getTransactionForSellingObj = async (ownerId, propertyId, previousHash, price) => {

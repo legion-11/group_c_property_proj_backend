@@ -4,12 +4,12 @@ const db = getDB();
 const transactionCollectionName = "transaction";
 const transactionCollection = db.collection(transactionCollectionName);
 
-const findByTransactionsByOwnerId = (id) => {
+const findTransactionsByOwnerId = (id) => {
     return transactionCollection
         .find({ ownerId: id }).toArray()
 };
 
-const findByTransactionsByPropertyId = (id) => {
+const findTransactionsByPropertyId = (id) => {
     return transactionCollection
         .find({ propertyId: id }).toArray()
 };
@@ -19,7 +19,7 @@ const findTransactions = () => {
         .find().toArray()
 };
 
-const findBTransactionId = (id) => {
+const findTransactionById = (id) => {
     return transactionCollection
         .findOne({ _id: id })
 };
@@ -36,4 +36,8 @@ const getLastTransaction = () => {
     )
 };
 
-module.exports = {getLastTransaction, insertTransaction};
+const getTransactionsCount = () => {
+    return transactionCollection.count()
+}
+
+module.exports = {getLastTransaction, insertTransaction, getTransactionsCount};

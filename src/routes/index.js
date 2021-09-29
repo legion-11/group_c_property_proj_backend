@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
 const {addUser} = require("../controller/user")
-const {addProperty, getProperties} = require("../controller/property")
+const {addProperty, getProperties, setPropertyForSale} = require("../controller/property")
 /**
  * -------------- POST ROUTES ----------------
  */
@@ -36,7 +36,6 @@ router.get('/signIn', (req, res, next) => {
 
 // When you visit http://localhost:3000/register, you will see "Register Page"
 router.get('/signUp', (req, res, next) => {
-    // TODO
     const form = '<h1>Sign Up Page</h1><form method="post" action="signUp">\
                     Enter Username:<br><input type="text" name="email">\
                     <br>Enter Password:<br><input type="password" name="password">\
@@ -46,6 +45,8 @@ router.get('/signUp', (req, res, next) => {
 
 router.get('/getProperties', getProperties);
 
+router.put('/setPropertyForSale', setPropertyForSale);
+
 /**
  * Lookup how to authenticate users on routes with Local Strategy
  * Google Search: "How to use Express Passport Local Strategy"
@@ -53,7 +54,6 @@ router.get('/getProperties', getProperties);
  * Also, look up what behaviour express session has without a maxage set
  */
 router.get('/protected-route', (req, res, next) => {
-
     console.log(req.user)
     // This is how you check if a user is authenticated and protect a route.  You could turn this into a custom middleware to make it less redundant
     if (req.isAuthenticated()) {

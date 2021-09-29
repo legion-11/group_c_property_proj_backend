@@ -24,6 +24,10 @@ const insertProperty = (property) => {
         .insertOne(property)
 };
 
+const findAndUpdateProperty = (query, update) => {
+    return propertyCollection.findOneAndUpdate(query, {$set: update})
+}
 
 
-module.exports = {findByPropertiesByOwnerId: findPropertiesByOwnerId, findByPropertyId: findPropertyById, insertProperty, findProperties};
+
+module.exports = {findPropertiesByOwnerId, findPropertyById, insertProperty, findProperties, findAndUpdateProperty};

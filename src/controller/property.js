@@ -1,4 +1,4 @@
-const {findByPropertiesByOwner, findByPropertyId, insertProperty, findProperties} = require("../model/property")
+const {findByPropertiesByOwner, findByPropertyId, insertProperty, findProperties, findAndUpdateProperty} = require("../model/property")
 const {addTransactionCreated} = require("../controller/transaction")
 
 //    const newProperty = {
@@ -18,12 +18,23 @@ const {addTransactionCreated} = require("../controller/transaction")
 //         img: [req.body.img],
 //     };
 
-const addProperty = async (req, res) => {
+const types = {
+    forSale: 0,
+    forRent: 1,
+    notForSaleOrRent: 2
+}
+
+const checkAuth = (req, res) => {
 
     if (!req.isAuthenticated()) {
         res.json({success: false, msg: "You are not authenticated"});
-        return
+        return false
     }
+    return true
+}
+
+const addProperty = async (req, res) => {
+    if (!checkAuth(req, res)) {return}
 
     console.log("addProperty "+ JSON.stringify(req.body))
 
@@ -38,7 +49,7 @@ const addProperty = async (req, res) => {
         isApartment: req.body.isApartment,
         apartmentNumber: req.body.apartmentNumber,
         createdAt: currentDate,
-        type: null,
+        type: types.notForSaleOrRent,
         startAt: null,
         endAt: null,
         // img: req.body.img,
@@ -69,4 +80,22 @@ const getProperties = (req, res) => {
 
 };
 
-module.exports = {addProperty, getProperties};
+
+const setPropertyForSale = async (req, res) => {
+    if (!checkAuth(req, res)) {return}
+    const propertyId = req.body.propertyId;
+    const userId = req.user._id;
+    const price = req.body.price;
+
+    try {
+        const updated = await findAndUpdateProperty(
+            {_id: propertyId, ownerId: userId},
+            {price: price, type: types.forSale}
+        )
+        console.log(updated)
+    }catch (e) {
+        console.log(e.message)
+    }
+
+}
+module.exports = {addProperty, getProperties, setPropertyForSale};
