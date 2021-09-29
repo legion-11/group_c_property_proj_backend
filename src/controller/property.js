@@ -205,9 +205,10 @@ const rentProperty = async (req, res) => {
 
     const x = () => {
         // comment goes here
+        // this is my change
     }
 
-    const x = () => {
+    const y = () => {
 
     }
 
