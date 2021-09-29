@@ -201,6 +201,23 @@ const rentProperty = async (req, res) => {
         res.json({success: false, msg: e.message});
         console.log(e.message)
     }
+
+    const buyProperty = async (req, res) => {
+        if (!checkAuth(req, res)) {return}
+        const propertyId = req.body.propertyId;
+        const userId = req.user._id;
+
+        try {
+            const updated = await findAndUpdateProperty(
+                {_id: propertyId},
+                {ownerId: userId, type: types.notForSaleOrRent}
+            )
+            console.log(updated)
+        }catch (e) {
+            console.log(e.message)
+        }
+
+    }
 }
 
 
