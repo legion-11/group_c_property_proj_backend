@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
 const {addUser} = require("../controller/user")
-const {addProperty, getProperties, setPropertyForSale} = require("../controller/property")
+const {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty} = require("../controller/property")
 /**
  * -------------- POST ROUTES ----------------
  */
@@ -20,6 +20,10 @@ router.post('/addProperty', addProperty);
 
 router.get('/', (req, res, next) => {
     res.send('<h1>Home</h1><p>Please <a href="/signUp">Sign Up</a></p>');
+});
+
+router.get("/user", (req, res) => {
+    res.json({user: req.user}); // The req.user stores the entire user that has been authenticated inside of it.
 });
 
 // When you visit http://localhost:3000/login, you will see "Login Page"
@@ -44,8 +48,6 @@ router.get('/signUp', (req, res, next) => {
 });
 
 router.get('/getProperties', getProperties);
-
-router.put('/setPropertyForSale', setPropertyForSale);
 
 /**
  * Lookup how to authenticate users on routes with Local Strategy
@@ -82,4 +84,13 @@ router.get('/signIn-failure', (req, res, next) => {
     res.send('You entered the wrong password.');
 });
 
+/**
+ * -------------- PUT ROUTES ----------------
+ */
+
+router.put('/setPropertyForSale', setPropertyForSale);
+
+router.put('/setPropertyForRent', setPropertyForRent);
+
+router.put('/rentProperty', rentProperty)
 module.exports = router;

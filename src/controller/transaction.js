@@ -3,11 +3,11 @@ const {hashObject} = require("../lib/passwordUtils");
 const {getLastTransaction, insertTransaction, getTransactionsCount} = require("../model/transaction")
 
 const types = {
-    create: 1,
-    sell: 2,
-    buy: 3,
-    setForRent: 4,
-    rent: 5,
+    create: 0,
+    setForSell: 1,
+    buy: 2,
+    setForRent: 3,
+    rent: 4,
 }
 
 let count = null;
@@ -45,34 +45,59 @@ const basicTransaction = async (type, ownerId, propertyId) => {
     }
 }
 
-const getTransactionCreatedObj = async (ownerId, propertyId) => {
-    const transactionObject = await basicTransaction(types.create, ownerId, propertyId)
-    transactionObject.hash = hashObject(transactionObject)
-    return transactionObject
-}
-
 const addTransactionCreated = async (ownerId, propertyId) => {
     try{
-        const trx = await getTransactionCreatedObj(ownerId, propertyId)
-        console.log(trx)
-        return insertTransaction(trx)
+        const transactionObject = await basicTransaction(types.create, ownerId, propertyId)
+        transactionObject.hash = hashObject(transactionObject)
+        console.log(transactionObject)
+        return insertTransaction(transactionObject)
     }catch (e) {
         count--
         console.error("addTransactionCreated: "+e.message)
     }
 }
 
-//
-// const getTransactionForSellingObj = async (ownerId, propertyId, previousHash, price) => {
-//     try {
-//         const transactionObject = basicTransaction(Type.create, ownerId, propertyId, previousHash)
-//         transactionObject.price = price
-//         transactionObject.hash = hashObject(transactionObject)
-//
-//         return transactionObject
-//     }catch (e) {
-//         console.error(e.message)
-//     }
-// }
+const addTransactionSetForSell = async (ownerId, propertyId, price) => {
+    try{
+        const transactionObject = await basicTransaction(types.setForSell, ownerId, propertyId)
+        transactionObject.price = price
+        transactionObject.hash = hashObject(transactionObject)
+        return insertTransaction(transactionObject)
+    }catch (e) {
+        count--
+        console.error("addTransactionSetForSelling: "+e.message)
+    }
+}
 
-module.exports = {addTransactionCreated};
+
+const addTransactionSetForRent = async (ownerId, propertyId, price, startAt, endAt) => {
+    try{
+        const transactionObject = await basicTransaction(types.setForRent, ownerId, propertyId)
+        transactionObject.price = price
+        transactionObject.startAt = startAt
+        transactionObject.endAt = endAt
+        transactionObject.hash = hashObject(transactionObject)
+        return insertTransaction(transactionObject)
+    }catch (e) {
+        count--
+        console.error("addTransactionSetForSelling: "+e.message)
+    }
+}
+
+const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, endAt) => {
+    try{
+        const transactionObject = await basicTransaction(types.rent, ownerId, propertyId)
+        transactionObject.price = price
+        transactionObject.startAt = startAt
+        transactionObject.endAt = endAt
+        transactionObject.buyerId = buyerId
+        transactionObject.hash = hashObject(transactionObject)
+        return insertTransaction(transactionObject)
+    }catch (e) {
+        count--
+        console.error("addTransactionSetForSelling: "+e.message)
+    }
+}
+
+
+module.exports = {addTransactionCreated, addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types};

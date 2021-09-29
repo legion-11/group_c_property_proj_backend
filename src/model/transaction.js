@@ -14,9 +14,9 @@ const findTransactionsByPropertyId = (id) => {
         .find({ propertyId: id }).toArray()
 };
 
-const findTransactions = () => {
+const findTransactions = (query={}, options={}) => {
     return transactionCollection
-        .find().toArray()
+        .find(query, options)
 };
 
 const findTransactionById = (id) => {
@@ -40,4 +40,4 @@ const getTransactionsCount = () => {
     return transactionCollection.count()
 }
 
-module.exports = {getLastTransaction, insertTransaction, getTransactionsCount};
+module.exports = {getLastTransaction, insertTransaction, getTransactionsCount, findTransactions};

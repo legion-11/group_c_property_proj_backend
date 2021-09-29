@@ -24,6 +24,7 @@ const verifyCallback = (email, password, cb) => {
         });
 }
 const strategy = new LocalStrategy(customFields, verifyCallback)
+
 passport.use(strategy);
 
 passport.serializeUser((user, cb) => {

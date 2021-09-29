@@ -15,15 +15,13 @@ function genPassword(password) {
 }
 
 const hashObject = (object) => {
-    const hash = crypto.createHash('sha256')
+    return crypto.createHash('sha256')
         .update(JSON.stringify(object, function (k, v) {
-            if (k[0] === "_") return undefined; // remove api stuff
-            else if (typeof v === "function") // consider functions
+            if (typeof v === "function") // consider functions
                 return undefined;
             else return v;
         }))
         .digest('hex');
-    return hash;
 }
 
 module.exports = {validPassword, genPassword, hashObject};
