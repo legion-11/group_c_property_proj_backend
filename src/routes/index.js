@@ -2,6 +2,9 @@ const router = require('express').Router();
 const passport = require('passport');
 const {addUser} = require("../controller/user")
 const {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty} = require("../controller/property")
+const {getTransactionsByOwnerId, getTransactionsByPropertyId,
+    getAllTransactions, getLastTransaction} = require("../controller/transaction");
+
 /**
  * -------------- POST ROUTES ----------------
  */
@@ -13,6 +16,8 @@ router.post('/signIn',
 router.post('/signUp', addUser);
 
 router.post('/addProperty', addProperty);
+
+router.post('/rentProperty', rentProperty)
 
 /**
  * -------------- GET ROUTES ----------------
@@ -47,8 +52,6 @@ router.get('/signUp', (req, res, next) => {
     res.send(form);
 });
 
-router.get('/getProperties', getProperties);
-
 /**
  * Lookup how to authenticate users on routes with Local Strategy
  * Google Search: "How to use Express Passport Local Strategy"
@@ -65,11 +68,6 @@ router.get('/protected-route', (req, res, next) => {
     }
 });
 
-
-router.get('/last', async(req, res) => {
-    res.json({trx: await require("../model/transaction").getLastTransaction()})
-});
-
 // Visiting this route logs the user out
 router.get('/logout', (req, res, next) => {
     req.logout();
@@ -84,6 +82,16 @@ router.get('/signIn-failure', (req, res, next) => {
     res.send('You entered the wrong password.');
 });
 
+router.get('/getTransactionsByOwner', getTransactionsByOwnerId);
+
+router.get('/getTransactionsByProperty', getTransactionsByPropertyId);
+
+router.get('/getAllTransactions', getAllTransactions);
+
+router.get('/last', getLastTransaction);
+
+router.get('/getProperties', getProperties);
+
 /**
  * -------------- PUT ROUTES ----------------
  */
@@ -92,5 +100,4 @@ router.put('/setPropertyForSale', setPropertyForSale);
 
 router.put('/setPropertyForRent', setPropertyForRent);
 
-router.put('/rentProperty', rentProperty)
 module.exports = router;

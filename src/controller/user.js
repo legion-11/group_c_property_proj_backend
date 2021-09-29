@@ -34,7 +34,7 @@ const addUser = async (req, res) => {
 
     insertUser(newUser)
         .then((user) => {
-            res.redirect('/signIn')
+            res.json({success: false})
         })
         .catch((err) => {
             res.json({success: false, msg: err});

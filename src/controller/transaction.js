@@ -1,6 +1,8 @@
 const {hashObject} = require("../lib/passwordUtils");
 
-const {getLastTransaction, insertTransaction, getTransactionsCount} = require("../model/transaction")
+const {findLastTransaction, insertTransaction, getTransactionsCount, findTransactionsByOwnerId,
+    findTransactionsByPropertyId, findTransactions
+} = require("../model/transaction")
 
 const types = {
     create: 0,
@@ -10,12 +12,11 @@ const types = {
     rent: 4,
 }
 
-let count = null;
-
+let _count = null;
 const getCount = async () => {
-    if (count == null) {
+    if (_count == null) {
         try {
-            count = await getTransactionsCount()
+            _count = await getTransactionsCount()
         }catch (e) {
             throw e
         }
@@ -23,7 +24,7 @@ const getCount = async () => {
 }
 
 const getLastTransactionHash = async () => {
-    const lastDoc = await getLastTransaction()
+    const lastDoc = await findLastTransaction()
     try {
         return  lastDoc.hash
     } catch (e) {
@@ -35,12 +36,12 @@ const basicTransaction = async (type, ownerId, propertyId) => {
     console.log("type " + type)
     await getCount()
     const previousHash = await getLastTransactionHash()
-    count++
+    _count++
     return {
         type: type,
         ownerId: ownerId,
         propertyId: propertyId,
-        nonce: count,
+        nonce: _count,
         previousHash: previousHash,
     }
 }
@@ -52,7 +53,7 @@ const addTransactionCreated = async (ownerId, propertyId) => {
         console.log(transactionObject)
         return insertTransaction(transactionObject)
     }catch (e) {
-        count--
+        _count--
         console.error("addTransactionCreated: "+e.message)
     }
 }
@@ -64,7 +65,7 @@ const addTransactionSetForSell = async (ownerId, propertyId, price) => {
         transactionObject.hash = hashObject(transactionObject)
         return insertTransaction(transactionObject)
     }catch (e) {
-        count--
+        _count--
         console.error("addTransactionSetForSelling: "+e.message)
     }
 }
@@ -79,7 +80,7 @@ const addTransactionSetForRent = async (ownerId, propertyId, price, startAt, end
         transactionObject.hash = hashObject(transactionObject)
         return insertTransaction(transactionObject)
     }catch (e) {
-        count--
+        _count--
         console.error("addTransactionSetForSelling: "+e.message)
     }
 }
@@ -94,10 +95,46 @@ const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, 
         transactionObject.hash = hashObject(transactionObject)
         return insertTransaction(transactionObject)
     }catch (e) {
-        count--
+        _count--
         console.error("addTransactionSetForSelling: "+e.message)
     }
 }
 
+const getTransactionsByOwnerId = async (req, res) => {
+    try {
+        const transactions = await findTransactionsByOwnerId(req.body.ownerId)
+        res.json({success: true, result: transactions});
+    } catch (e) {
+        res.json({success: false, msg: e.message});
+    }
+}
 
-module.exports = {addTransactionCreated, addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types};
+const getTransactionsByPropertyId = async (req, res) => {
+    try {
+        const transactions = await findTransactionsByPropertyId(req.body.propertyId)
+        res.json({success: true, result: transactions});
+    } catch (e) {
+        res.json({success: false, msg: e.message});
+    }
+}
+
+const getAllTransactions = async (req, res) => {
+    try {
+        const transactions = await findTransactions()
+        res.json({success: true, result: transactions});
+    } catch (e) {
+        res.json({success: false, msg: e.message});
+    }
+}
+
+const getLastTransaction = async (req, res) => {
+    try {
+        const transactions = await findLastTransaction()
+        res.json({success: true, result: transactions});
+    } catch (e) {
+        res.json({success: false, msg: e.message});
+    }
+}
+
+module.exports = {addTransactionCreated, addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types,
+    getTransactionsByOwnerId, getTransactionsByPropertyId, getAllTransactions, getLastTransaction};

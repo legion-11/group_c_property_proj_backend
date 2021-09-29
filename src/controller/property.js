@@ -66,21 +66,19 @@ const addProperty = async (req, res) => {
         console.log("addProperty: transaction ")
         console.log(trx)
 
-        res.json({success: true, msg: property});
+        res.json({success: true, result: property});
     } catch (err) {
         res.json({success: false, msg: err.message});
     }
 };
 
-const getProperties = (req, res) => {
-    findProperties()
-        .then((properties) => {
-            res.json(properties);
-        })
-        .catch((err) => {
-            res.json({success: false, msg: err});
-        })
-
+const getProperties = async (req, res) => {
+    try {
+        const properties = await findProperties()
+        res.json({success: true, result: properties});
+    }catch (e) {
+        res.json({success: false, msg: e.message});
+    }
 };
 
 const setPropertyForSale = async (req, res) => {
@@ -92,16 +90,15 @@ const setPropertyForSale = async (req, res) => {
         const userId = new ObjectId(req.user._id);
         const price = req.body.price;
 
-        const trx = addTransactionSetForSell(userId, propertyId, price)
-        const updated = findAndUpdateProperty(
+        const trx = await addTransactionSetForSell(userId, propertyId, price)
+        const updated = await findAndUpdateProperty(
             {_id: new ObjectId(propertyId), ownerId: userId},
             {price: price, type: types.forSale}
         )
-        await trx
-        res.json({updated: await updated})
+        res.json({success: true, result:  updated})
         console.log(updated)
     }catch (e) {
-        res.json({success: false, msg: err});
+        res.json({success: false, msg: e.message});
         console.log(e.message)
     }
 }
@@ -114,19 +111,26 @@ const setPropertyForRent = async (req, res) => {
         const propertyId = new ObjectId(req.body.propertyId);
         const userId = req.user._id;
         const price = req.body.price;
-        const startAt = new Date(req.body.startAt);
-        const endAt = new Date(req.body.endAt);
+        let startAt = new Date(req.body.startAt);
+        if (startAt < new Date()) {
+            startAt = new Date()
+        }
 
-        const trx = addTransactionSetForRent(userId, propertyId, price, startAt, endAt)
-        const updated = findAndUpdateProperty(
+        const endAt = new Date(req.body.endAt);
+        if (endAt < new Date()) {
+            res.json({success: false, msg: "wrong period"});
+            return
+        }
+
+        const trx = await addTransactionSetForRent(userId, propertyId, price, startAt, endAt)
+        const updated = await findAndUpdateProperty(
             {_id: propertyId, ownerId: userId},
             {price: price, type: types.forRent, startAt: startAt, endAt: endAt}
         )
-        await trx
-        res.json({updated: await updated})
+        res.json({success: true, result: updated})
         console.log(updated)
     }catch (e) {
-        res.json({success: false, msg: err});
+        res.json({success: false, msg: e.message});
         console.log(e.message)
     }
 }
@@ -155,7 +159,6 @@ const rentProperty = async (req, res) => {
         const buyerId = req.user._id;
 
         if (startAt < property.startAt  || property.endAt < endAt) {
-
             res.json({success: false, msg: "wrong period"});
             return
         }
@@ -170,8 +173,8 @@ const rentProperty = async (req, res) => {
                 propertyId: propertyId,
                 type: transactionTypes.rent,
                 $or: [
-                    {$and: [ { startAt : {$lte: endAt}}, { startAt : {$gte: startAt} } ] },
-                    {$and: [ { endAt : {$lte: endAt}}, { endAt : {$gte: startAt} } ] },
+                    { $and: [ { startAt : {$lte: endAt}}, { startAt : {$gte: startAt} } ] },
+                    { $and: [ { endAt : {$lte: endAt}}, { endAt : {$gte: startAt} } ] },
                     {
                         $and:
                             [
@@ -184,7 +187,7 @@ const rentProperty = async (req, res) => {
                 ]
             },
             {}
-        ).toArray()
+        )
 
         console.log(checkPeriodResult)
         if (checkPeriodResult.length !== 0) {
@@ -195,7 +198,7 @@ const rentProperty = async (req, res) => {
         await addTransactionRent(property.ownerId, buyerId, propertyId, property.price, startAt, endAt)
         res.json({success: true})
     }catch (e) {
-        res.json({success: false, msg: e});
+        res.json({success: false, msg: e.message});
         console.log(e.message)
     }
 }
