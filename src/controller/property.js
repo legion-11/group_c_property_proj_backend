@@ -7,22 +7,6 @@ const {addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, t
 } = require("./transaction");
 const {findTransactions} = require("../model/transaction");
 const ObjectId = require("mongodb").ObjectId
-//    const newProperty = {
-//         ownerId: req.body.ownerId,
-//         contactNumber: req.body.contactNumber,
-//         createdAt: new Date(),
-//         description: req.body.description,
-//         zipcode: req.body.zipcode,
-//         city: req.body.city,
-//         country: req.body.country,
-//         isApartment: req.body.isApartment,
-//         apartmentNumber: req.body.apartmentNumber,
-//         price: req.body.price,
-//         startAt: req.body.startAt,
-//         endAt: req.body.endAt,
-//         type: req.body.type,
-//         img: [req.body.img],
-//     };
 
 const types = {
     notForSaleOrRent: 0,
@@ -41,9 +25,9 @@ const checkAuth = (req, res) => {
 
 const addProperty = async (req, res) => {
     console.log("addProperty " + types.forSale+ " " + JSON.stringify(req.body))
+    console.log(req.user)
     if (!checkAuth(req, res)) {return}
 
-    const currentDate = new Date()
     const newProperty = {
         ownerId: req.user._id,
         contactNumber: req.body.contactNumber,
@@ -51,12 +35,8 @@ const addProperty = async (req, res) => {
         zipcode: req.body.zipcode,
         city: req.body.city,
         country: req.body.country,
-        isApartment: req.body.isApartment,
         apartmentNumber: req.body.apartmentNumber,
-        createdAt: currentDate,
-        type: types.notForSaleOrRent,
-        startAt: null,
-        endAt: null,
+        type: types.notForSaleOrRent
         // img: req.body.img,
     };
     try {
@@ -95,7 +75,7 @@ const setPropertyForSale = async (req, res) => {
 
         const trx = await addTransactionSetForSell(userId, propertyId, price)
         const updated = await findAndUpdateProperty(
-            {_id: new ObjectId(propertyId), ownerId: userId},
+            {_id: propertyId, ownerId: userId},
             {price: price, type: types.forSale}
         )
         res.json({success: true, result:  updated})
@@ -114,21 +94,11 @@ const setPropertyForRent = async (req, res) => {
         const propertyId = new ObjectId(req.body.propertyId);
         const userId = req.user._id;
         const price = req.body.price;
-        let startAt = new Date(req.body.startAt);
-        if (startAt < new Date()) {
-            startAt = new Date()
-        }
 
-        const endAt = new Date(req.body.endAt);
-        if (endAt < new Date()) {
-            res.json({success: false, msg: "wrong period"});
-            return
-        }
-
-        const trx = await addTransactionSetForRent(userId, propertyId, price, startAt, endAt)
+        const trx = await addTransactionSetForRent(userId, propertyId, price)
         const updated = await findAndUpdateProperty(
             {_id: propertyId, ownerId: userId},
-            {price: price, type: types.forRent, startAt: startAt, endAt: endAt}
+            {price: price, type: types.forRent}
         )
         res.json({success: true, result: updated})
         console.log(updated)
@@ -162,7 +132,7 @@ const rentProperty = async (req, res) => {
         const endAt = new Date(req.body.endAt);
         const buyerId = req.user._id;
 
-        if (startAt < property.startAt  || property.endAt < endAt) {
+        if (startAt < new Date()  || new Date() < endAt) {
             res.json({success: false, msg: "wrong period"});
             return
         }
@@ -195,7 +165,7 @@ const rentProperty = async (req, res) => {
 
         console.log(checkPeriodResult)
         if (checkPeriodResult.length !== 0) {
-            res.json({success: false, msg: "wrong period 2"});
+            res.json({success: false, msg: "Someone already rented for this period"});
             return
         }
 

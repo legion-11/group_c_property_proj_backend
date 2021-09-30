@@ -7,7 +7,11 @@ dotenv.config()
 
 const app = express()
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3009", // allow to server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // allow session cookie from browser to pass through
+}));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 

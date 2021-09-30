@@ -59,9 +59,9 @@ const addTransactionCreated = async (ownerId, propertyId) => {
     }
 }
 
-const addTransactionSetForSell = async (ownerId, propertyId, price) => {
+const addSetterTransactionFromOwner = async (type, ownerId, propertyId, price) => {
     try{
-        const transactionObject = await basicTransaction(types.setForSell, ownerId, propertyId)
+        const transactionObject = await basicTransaction(type, ownerId, propertyId)
         transactionObject.price = price
         transactionObject.hash = hashObject(transactionObject)
         return insertTransaction(transactionObject)
@@ -72,20 +72,12 @@ const addTransactionSetForSell = async (ownerId, propertyId, price) => {
     }
 }
 
+const addTransactionSetForSell = async (ownerId, propertyId, price) => {
+    return await addTransactionFromOwner(types.setForSell, ownerId, propertyId, price)
+}
 
-const addTransactionSetForRent = async (ownerId, propertyId, price, startAt, endAt) => {
-    try{
-        const transactionObject = await basicTransaction(types.setForRent, ownerId, propertyId)
-        transactionObject.price = price
-        transactionObject.startAt = startAt
-        transactionObject.endAt = endAt
-        transactionObject.hash = hashObject(transactionObject)
-        return insertTransaction(transactionObject)
-    }catch (e) {
-        _count--
-        console.error("addTransactionSetForSelling: "+e.message)
-        throw e
-    }
+const addTransactionSetForRent = async (ownerId, propertyId, price) => {
+    return await addTransactionFromOwner(types.setForRent, ownerId, propertyId, price)
 }
 
 const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, endAt) => {
