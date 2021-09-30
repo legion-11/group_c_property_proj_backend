@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const passport = require('passport');
 const {addUser, parseUser} = require("../controller/user")
-const {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty, buyProperty} = require("../controller/property")
+const {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty, buyProperty, getProperty} = require("../controller/property")
 const {getTransactionsByOwnerId, getTransactionsByPropertyId,
     getAllTransactions, getLastTransaction} = require("../controller/transaction");
 
@@ -71,6 +71,7 @@ router.get('/last', getLastTransaction);
 
 router.get('/getProperties', getProperties);
 
+router.get('/property/:id', getProperty);
 /**
  * -------------- PUT ROUTES ----------------
  */

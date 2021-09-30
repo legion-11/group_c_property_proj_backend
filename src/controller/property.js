@@ -214,4 +214,13 @@ const buyProperty = async (req, res) => {
     }
 }
 
-module.exports = {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty, buyProperty};
+const getProperty = async (req, res) => {
+    const id = req.params.id
+    try {
+        const result = await findPropertyById(new ObjectId(id))
+        res.json({success: true, result: result})
+    }catch (e) {
+        res.json({success: false, msg: "Wrong input"})
+    }
+}
+module.exports = {addProperty, getProperties, setPropertyForSale, setPropertyForRent, rentProperty, buyProperty, getProperty};
