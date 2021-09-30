@@ -9,6 +9,7 @@ const customFields = {
 }
 
 const verifyCallback = (email, password, cb) => {
+    console.log(email, password)
     findByEmail(email)
         .then((user) => {
             if (!user) { return cb(null, false) }

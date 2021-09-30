@@ -34,13 +34,15 @@ const addUser = async (req, res) => {
 
     insertUser(newUser)
         .then((user) => {
-            res.json({success: false})
+            res.json({success: true})
         })
         .catch((err) => {
             res.json({success: false, msg: err});
         });
 };
 
+const parseUser = (user) => {
+    return (({ salt, hash, lastTimeAuth, ...o }) => o)(user)
+}
 
-
-module.exports = {addUser};
+module.exports = {addUser, parseUser};
