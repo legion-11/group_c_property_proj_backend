@@ -9,9 +9,9 @@ const findPropertiesByOwnerId = (id) => {
         .find({ ownerId: id }).toArray()
 };
 
-const findProperties = () => {
+const findProperties = (query) => {
     return propertyCollection
-        .find().toArray()
+        .find(query).toArray()
 };
 
 const findPropertyById = (id) => {

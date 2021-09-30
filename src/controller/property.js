@@ -2,7 +2,9 @@ const {findByPropertiesByOwner, findByPropertyId, insertProperty, findProperties
     findPropertyById
 } = require("../model/property")
 const {addTransactionCreated} = require("../controller/transaction")
-const {addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types: transactionTypes} = require("./transaction");
+const {addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types: transactionTypes,
+    addTransactionBuy
+} = require("./transaction");
 const {findTransactions} = require("../model/transaction");
 const ObjectId = require("mongodb").ObjectId
 //    const newProperty = {
@@ -74,7 +76,8 @@ const addProperty = async (req, res) => {
 
 const getProperties = async (req, res) => {
     try {
-        const properties = await findProperties()
+        const type = parseInt(req.query.type)
+        const properties = await findProperties({type: type})
         res.json({success: true, result: properties});
     }catch (e) {
         res.json({success: false, msg: e.message});
@@ -144,6 +147,7 @@ const rentProperty = async (req, res) => {
         const propertyId = new ObjectId(req.body.propertyId);
         const property = await findPropertyById(propertyId);
         console.log(property)
+
         if (!property) {
             res.json({success: false, msg: " not found"});
             return
@@ -205,16 +209,37 @@ const rentProperty = async (req, res) => {
 
 const buyProperty = async (req, res) => {
     if (!checkAuth(req, res)) {return}
-    const propertyId = req.body.propertyId;
-    const userId = req.user._id;
+    const propertyId = new ObjectId(req.body.propertyId);
+    const buyerId = req.user._id;
 
     try {
+        const property = await findPropertyById(propertyId);
+
+        if (!property) {
+            res.json({success: false, msg: " not found"});
+            return
+        }
+
+        if (property.type !== types.forSale) {
+            res.json({success: false, msg: "not for sale"});
+            return
+        }
+
+        if (property.ownerId.toString() === buyerId.toString()) {
+            res.json({success: false, msg: "can not buy from yourself"});
+            return
+        }
+
+        await addTransactionBuy(property.ownerId, buyerId, property._id, property.price)
+
         const updated = await findAndUpdateProperty(
             {_id: propertyId},
-            {ownerId: userId, type: types.notForSaleOrRent}
+            {ownerId: buyerId, type: types.notForSaleOrRent}
         )
+        res.json({success: true})
         console.log(updated)
     }catch (e) {
+        res.json({success: false, msg: e.message});
         console.log(e.message)
     }
 }

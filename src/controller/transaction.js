@@ -55,6 +55,7 @@ const addTransactionCreated = async (ownerId, propertyId) => {
     }catch (e) {
         _count--
         console.error("addTransactionCreated: "+e.message)
+        throw e
     }
 }
 
@@ -67,6 +68,7 @@ const addTransactionSetForSell = async (ownerId, propertyId, price) => {
     }catch (e) {
         _count--
         console.error("addTransactionSetForSelling: "+e.message)
+        throw e
     }
 }
 
@@ -82,6 +84,7 @@ const addTransactionSetForRent = async (ownerId, propertyId, price, startAt, end
     }catch (e) {
         _count--
         console.error("addTransactionSetForSelling: "+e.message)
+        throw e
     }
 }
 
@@ -97,6 +100,22 @@ const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, 
     }catch (e) {
         _count--
         console.error("addTransactionSetForSelling: "+e.message)
+        throw e
+    }
+}
+
+
+const addTransactionBuy = async (ownerId, buyerId, propertyId, price) => {
+    try{
+        const transactionObject = await basicTransaction(types.rent, ownerId, propertyId)
+        transactionObject.price = price
+        transactionObject.buyerId = buyerId
+        transactionObject.hash = hashObject(transactionObject)
+        return insertTransaction(transactionObject)
+    }catch (e) {
+        _count--
+        console.error("addTransactionSetForSelling: "+e.message)
+        throw e
     }
 }
 
@@ -136,5 +155,5 @@ const getLastTransaction = async (req, res) => {
     }
 }
 
-module.exports = {addTransactionCreated, addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, types,
+module.exports = {addTransactionCreated, addTransactionSetForSell, addTransactionSetForRent, addTransactionRent, addTransactionBuy, types,
     getTransactionsByOwnerId, getTransactionsByPropertyId, getAllTransactions, getLastTransaction};
