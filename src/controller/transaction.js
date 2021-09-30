@@ -73,11 +73,11 @@ const addSetterTransactionFromOwner = async (type, ownerId, propertyId, price) =
 }
 
 const addTransactionSetForSell = async (ownerId, propertyId, price) => {
-    return await addTransactionFromOwner(types.setForSell, ownerId, propertyId, price)
+    return await addSetterTransactionFromOwner(types.setForSell, ownerId, propertyId, price)
 }
 
 const addTransactionSetForRent = async (ownerId, propertyId, price) => {
-    return await addTransactionFromOwner(types.setForRent, ownerId, propertyId, price)
+    return await addSetterTransactionFromOwner(types.setForRent, ownerId, propertyId, price)
 }
 
 const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, endAt) => {
@@ -99,7 +99,7 @@ const addTransactionRent = async (ownerId, buyerId, propertyId, price, startAt, 
 
 const addTransactionBuy = async (ownerId, buyerId, propertyId, price) => {
     try{
-        const transactionObject = await basicTransaction(types.rent, ownerId, propertyId)
+        const transactionObject = await basicTransaction(types.buy, ownerId, propertyId)
         transactionObject.price = price
         transactionObject.buyerId = buyerId
         transactionObject.hash = hashObject(transactionObject)

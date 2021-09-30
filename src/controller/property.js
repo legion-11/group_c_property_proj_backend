@@ -178,6 +178,7 @@ const rentProperty = async (req, res) => {
 }
 
 const buyProperty = async (req, res) => {
+    console.log("buy")
     if (!checkAuth(req, res)) {return}
     const propertyId = new ObjectId(req.body.propertyId);
     const buyerId = req.user._id;
