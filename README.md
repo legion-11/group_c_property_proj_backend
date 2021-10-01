@@ -4,7 +4,9 @@
 
 1. insert .env file with that data:
 ATLAS_URI=mongodb+srv://<your-user>:<your-password>@cluster0.aylhq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
+  
 SERVER_PORT=8888
+  
 SECRET=your-secret
 
 2. in group_c_property_proj_backend/server.js edit cors params to your frontend port (for me it was 3009)
