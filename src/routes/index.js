@@ -63,9 +63,9 @@ router.get('/logout', (req, res, next) => {
 
 router.get('/getTransactionsByOwner', getTransactionsByOwnerId);
 
-router.get('/getTransactionsByProperty', getTransactionsByPropertyId);
-
 router.get('/getAllTransactions', getAllTransactions);
+
+router.get('/getTransactions/:id', getTransactionsByPropertyId);
 
 router.get('/last', getLastTransaction);
 

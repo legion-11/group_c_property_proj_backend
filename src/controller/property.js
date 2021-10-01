@@ -110,7 +110,7 @@ const setPropertyForRent = async (req, res) => {
 
 
 const rentProperty = async (req, res) => {
-    console.log("rentProperty "+ types.rent)
+    console.log("rentProperty "+ transactionTypes.rent)
     console.log(req.body)
     if (!checkAuth(req, res)) {return}
     try {
@@ -131,8 +131,7 @@ const rentProperty = async (req, res) => {
         const startAt = new Date(req.body.startAt);
         const endAt = new Date(req.body.endAt);
         const buyerId = req.user._id;
-
-        if (startAt < new Date()  || new Date() < endAt) {
+        if (startAt < new Date()  || endAt < new Date() ) {
             res.json({success: false, msg: "wrong period"});
             return
         }
