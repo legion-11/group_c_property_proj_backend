@@ -3,6 +3,7 @@
 0. write "npm install" in the terminal to download all needed modules
 
 1. insert .env file with that data:
+
 ATLAS_URI=mongodb+srv://<your-user>:<your-password>@cluster0.aylhq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority
   
 SERVER_PORT=8888
